@@ -1,0 +1,6 @@
+.idea
+.history
+backend/dist
+backend/node_modules
+front/dist
+front/node_modules

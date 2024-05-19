@@ -1,0 +1,22 @@
+{
+  "name": "websocket-rabbitmq-server",
+  "version": "1.0.0",
+  "description": "A simple server that communicates via WebSockets and queues messages with RabbitMQ",
+  "main": "dist/server.js",
+  "scripts": {
+    "start": "tsc && node dist/server.js"
+  },
+  "dependencies": {
+    "amqplib": "^0.8.0",
+    "express": "^4.17.1",
+    "ws": "^8.2.3"
+  },
+  "devDependencies": {
+    "@types/amqplib": "^0.8.2",
+    "@types/express": "^4.17.21",
+    "@types/node": "^16.7.13",
+    "@types/ws": "^8.2.0",
+    "nodemon": "^3.1.0",
+    "typescript": "^4.4.3"
+  }
+}
