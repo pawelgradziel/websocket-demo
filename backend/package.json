@@ -4,7 +4,8 @@
   "description": "A simple server that communicates via WebSockets and queues messages with RabbitMQ",
   "main": "dist/server.js",
   "scripts": {
-    "start": "tsc && node dist/server.js"
+    "start": "tsc && node dist/server.js",
+    "watch": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/server.ts"
   },
   "dependencies": {
     "amqplib": "^0.8.0",
@@ -17,6 +18,7 @@
     "@types/node": "^16.7.13",
     "@types/ws": "^8.2.0",
     "nodemon": "^3.1.0",
+    "ts-node": "^10.9.2",
     "typescript": "^4.4.3"
   }
 }
