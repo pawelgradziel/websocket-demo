@@ -23,7 +23,7 @@ const connectWithRetry = () => {
       console.log(`Backend server started on port ${port}`);
     });
     
-    // is it used?
+    // on client re-connect 
     server.on('upgrade', (request, socket, head) => {
       console.log('Upgrading connection to WebSocket...');
       wss.handleUpgrade(request, socket, head, ws => {
@@ -46,12 +46,12 @@ const wss = new WebSocketServer({ noServer: true });
 wss.on('connection', ws => {
   console.log('New WebSocket connection.');
 
+  // listen to incoming messages from client (sent via websocket)
   ws.on('message', message => {
-    const messageObj = JSON.parse(message.toString());
-    console.log('WebSocket message received', messageObj);
+    console.log('WebSocket message received:', message.toString());
     // Enqueue message to RabbitMQ
     if (channel) {
-      console.log('Sending message to RabbitMQ chat_queue...');
+      console.log('Sending ws message to RabbitMQ chat_queue...');
       channel.sendToQueue('chat_queue', Buffer.from(message.toString()));
     }
   });
@@ -66,11 +66,11 @@ wss.on('connection', ws => {
           const response = {
             sender: 'server',
             to: msgObj.sender || 'unknown',
-            message: 'I am a server response',
+            message: 'I am a server response for your message: ' + msgObj.message,
             time: Date.now()
           };
           console.log('Queueing mocked ModelAI response to RabbitMQ chat_responses', response);
-          channel.sendToQueue('chat_responses', Buffer.from(response.toString()));
+          channel.sendToQueue('chat_responses', Buffer.from(JSON.stringify(response)));
           channel.ack(msg);
           console.log('Queueing mocked ModelAI done');
         }, Math.random() * 1000);
@@ -79,13 +79,11 @@ wss.on('connection', ws => {
 
     channel.consume('chat_responses', msg => {
       if (msg) {
-        // TODO how to convert msg.content to JSON object?
-        console.log('Message received from RabbitMQ chat_responses', msg.content.toJSON()); 
-        // const msgObj = JSON.parse(msg.content);
-        // console.log('Message received from RabbitMQ chat_responses, sending to client via websocket...', msgObj);
+        console.log('Message received from RabbitMQ chat_responses', msg.content.toString());
         // send to client via websocket
         ws.send(msg.content);
-        console.log('Message sent to client via websocket')
+        console.log('Message sent to client via websocket');
+        // delete message from queue
         channel.ack(msg);
       }
     });
