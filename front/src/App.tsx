@@ -56,8 +56,9 @@ const App = () => {
       }
     };
 
+    const wsCurrent = ws.current;
     return () => {
-      ws.current?.close();
+      wsCurrent?.close();
       console.log(`ws connection closed to ${wsConnectionString}`);
     };
   }, []);

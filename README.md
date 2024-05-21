@@ -29,7 +29,7 @@ docker compose up
 
 ## known issues
 * ~~chat first load: long time to establish websocket connection (not sure if that is front or backend issue)~~
-* chat: reloading chat cause to lost ws connection; seems like server is sending responses but client is not able to receive that
+* chat: reloading chat cause to lost ws connection; only every n-message from backend are received (where n is amount of chat app refresh) 
 * chat: if quickly sending messages, chat not renders all responses (newer messages overwrites old ones?) 
 
 ## architecture questions

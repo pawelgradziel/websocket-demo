@@ -82,7 +82,7 @@ wss.on('connection', ws => {
         console.log('Message received from RabbitMQ chat_responses', msg.content.toString());
         // send to client via websocket
         ws.send(msg.content.toString());
-        console.log('Message sent to client via websocket');
+        console.log('Message sent to client via websocket', msg.content.toString());
         // delete message from queue
         channel.ack(msg);
       }
