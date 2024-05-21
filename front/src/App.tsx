@@ -39,7 +39,7 @@ const App = () => {
     ws.current = new WebSocket(wsConnectionString);
     console.log(`ws connection opened at ${wsConnectionString}`);
 
-    // listen to websocker responses
+    // listen to websocket responses
     ws.current.onmessage = (event) => {
       console.log('Received message from ws backend', event.data);
       try {

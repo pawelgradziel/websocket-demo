@@ -69,7 +69,7 @@ wss.on('connection', ws => {
             message: 'I am a server response for your message: ' + msgObj.message,
             time: Date.now()
           };
-          console.log('Queueing mocked ModelAI response to RabbitMQ chat_responses', response);
+          console.log('Queueing mocked ModelAI response to RabbitMQ chat_responses', JSON.stringify(response));
           channel.sendToQueue('chat_responses', Buffer.from(JSON.stringify(response)));
           channel.ack(msg);
           console.log('Queueing mocked ModelAI done');
@@ -81,7 +81,7 @@ wss.on('connection', ws => {
       if (msg) {
         console.log('Message received from RabbitMQ chat_responses', msg.content.toString());
         // send to client via websocket
-        ws.send(msg.content);
+        ws.send(msg.content.toString());
         console.log('Message sent to client via websocket');
         // delete message from queue
         channel.ack(msg);

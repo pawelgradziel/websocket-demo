@@ -29,11 +29,14 @@ docker compose up
 
 ## known issues
 * ~~chat first load: long time to establish websocket connection (not sure if that is front or backend issue)~~
+* chat: reloading chat cause to lost ws connection; seems like server is sending responses but client is not able to receive that
+* chat: if quickly sending messages, chat not renders all responses (newer messages overwrites old ones?) 
 
 ## architecture questions
 * one websocket connection per each client? 
   * if yes, how to separate communication? use dedicated per-user queues?
-* separate queue handling from websockets
+* how to separate backend queue handling and websockets?
+* how to direct WS message to one client only?
 
 ## TODO
 * ~~chat: dummy chat functionality~~
@@ -45,6 +48,6 @@ docker compose up
 * ~~server: send model AI messages back to chat via web socket~~
 * chat: listen and show responses from websocket
 * chat: re-establish web socket connection if connection lost
-* server: auto-restart / watch files if app crashed or files changed 
+* ~~server: auto-restart / watch files if app crashed or files changed~~
 
 
