@@ -23,8 +23,8 @@ docker compose up
 ```
 
 ## links
-* chat application http://localhost:5055/
-* RabitMQ interface http://localhost:15672/#/queues (log in with guest/guest)
+* chat application http://front.localhost/
+* RabbitMQ interface http://rabbitmq.localhost/#/queues (log in with guest/guest)
 * application logs can be found in `docker compose up` output
 
 ## known issues
@@ -49,5 +49,10 @@ docker compose up
 * chat: listen and show responses from websocket
 * chat: re-establish web socket connection if connection lost
 * ~~server: auto-restart / watch files if app crashed or files changed~~
-
-
+* ~~reverse proxy: use https://traefik.io/~~
+* socket.io
+https://socket.io/docs/v4/rooms/
+https://socket.io/docs/v4/adapter/#emitter
+https://socket.io/docs/v4/redis-streams-adapter/
+* use multiple clients at the same time - get dedicated messages just for that client
+* try to break chat, so it try to reconnect

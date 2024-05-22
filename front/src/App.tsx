@@ -34,7 +34,8 @@ const App = () => {
   const ws = useRef<WebSocket | null>(null);
 
   useEffect(() => {
-    const wsConnectionString = 'ws://localhost:3025';
+    // const wsConnectionString = 'ws://localhost:3025';
+    const wsConnectionString = 'ws://backend.localhost';
     console.log(`Connecting to ws server ${wsConnectionString}...`);
     ws.current = new WebSocket(wsConnectionString);
     console.log(`ws connection opened at ${wsConnectionString}`);

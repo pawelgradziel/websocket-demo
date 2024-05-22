@@ -18,7 +18,7 @@ const connectWithRetry = () => {
       return;
     }
     console.log('Established connect to RabbitMQ...');
-
+    
     const server = app.listen(port, () => {
       console.log(`Backend server started on port ${port}`);
     });
@@ -92,3 +92,7 @@ wss.on('connection', ws => {
 
 // Start the connection process
 connectWithRetry();
+
+app.get('/', (req, res) => { 
+  res.send('OK');
+});
