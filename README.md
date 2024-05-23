@@ -50,6 +50,7 @@ docker compose up
 * chat: re-establish web socket connection if connection lost
 * ~~server: auto-restart / watch files if app crashed or files changed~~
 * ~~reverse proxy: use https://traefik.io/~~
+* remove traefik/prometheus - see docker errors/warnings
 * socket.io
 https://socket.io/docs/v4/rooms/
 https://socket.io/docs/v4/adapter/#emitter
