@@ -39,6 +39,14 @@ docker compose up
 * how to direct WS message to one client only?
 
 ## TODO
+* socket.io features to try
+https://socket.io/docs/v4/rooms/
+https://socket.io/docs/v4/adapter/#emitter
+https://socket.io/docs/v4/redis-streams-adapter/
+* use multiple clients at the same time - get dedicated messages just for that client
+* try to break chat, so it try to reconnect
+* remove traefik/prometheus - see docker errors/warnings
+
 * ~~chat: dummy chat functionality~~
 * ~~chat: send messages via web socket~~
 * ~~server: enqueue messsages into rabbitmq~~
@@ -46,14 +54,9 @@ docker compose up
 * ~~docker: add frontend app there~~
 * ~~server: mock AI model responses and queue them into rabbitmq~~
 * ~~server: send model AI messages back to chat via web socket~~
-* chat: listen and show responses from websocket
-* chat: re-establish web socket connection if connection lost
+* ~~chat: listen and show responses from websocket~~
 * ~~server: auto-restart / watch files if app crashed or files changed~~
 * ~~reverse proxy: use https://traefik.io/~~
-* remove traefik/prometheus - see docker errors/warnings
-* socket.io
-https://socket.io/docs/v4/rooms/
-https://socket.io/docs/v4/adapter/#emitter
-https://socket.io/docs/v4/redis-streams-adapter/
-* use multiple clients at the same time - get dedicated messages just for that client
-* try to break chat, so it try to reconnect
+* ~~frontend hot-reload with vite~~
+* ~~chat: re-establish web socket connection if connection lost~~
+* ~~replace standard websocket with socket.io~~
