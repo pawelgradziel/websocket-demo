@@ -25,6 +25,7 @@ docker compose up
 ## links
 * chat application http://front.localhost/
 * RabbitMQ interface http://rabbitmq.localhost/#/queues (log in with guest/guest)
+* Traefik web interface http://traefik.localhost/dashboard/#/
 * application logs can be found in `docker compose up` output
 
 ## known issues
@@ -46,7 +47,6 @@ https://socket.io/docs/v4/redis-streams-adapter/
 * use multiple clients at the same time - get dedicated messages just for that client
 * sticky session (which hopefully could be solved by some traefik labels, see https://socket.io/docs/v4/using-multiple-nodes/#traefik, but it would be good to get proof it's actually working)
 * try to break chat, so it try to reconnect
-* remove traefik/prometheus - see docker errors/warnings
 
 * ~~chat: dummy chat functionality~~
 * ~~chat: send messages via web socket~~
@@ -61,3 +61,4 @@ https://socket.io/docs/v4/redis-streams-adapter/
 * ~~frontend hot-reload with vite~~
 * ~~chat: re-establish web socket connection if connection lost~~
 * ~~replace standard websocket with socket.io~~
+* ~~remove traefik/prometheus - see docker errors/warnings~~

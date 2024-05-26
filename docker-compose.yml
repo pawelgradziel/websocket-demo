@@ -7,6 +7,7 @@ services:
       - '5672:5672'
       - '15672:15672'
     labels:
+      - "traefik.enable=true"
       - "traefik.http.routers.rabbitmq.rule=Host(`rabbitmq.localhost`)"
       - "traefik.http.routers.rabbitmq.entrypoints=web"
       - "traefik.http.services.rabbitmq.loadbalancer.server.port=15672"
@@ -24,6 +25,7 @@ services:
     command: bash -c "tsc && npm run watch"
     restart: on-failure
     labels:
+      - "traefik.enable=true"
       - "traefik.http.routers.backend.rule=Host(`backend.localhost`)"
       - "traefik.http.routers.backend.entrypoints=web"
       - "traefik.http.services.backend.loadbalancer.server.port=3025"
@@ -37,6 +39,7 @@ services:
     command: bash -c "npm run build && npm run dev"
     restart: on-failure
     labels:
+      - "traefik.enable=true"
       - "traefik.http.routers.front.rule=Host(`front.localhost`)"
       - "traefik.http.routers.front.entrypoints=web"
 
@@ -47,10 +50,14 @@ services:
     command: 
       - "--api.insecure=true"
       - "--providers.docker"
+      - "--providers.docker.exposedbydefault=false" # ignore ie. promethues
       - "--entrypoints.web.address=:80"
     ports:
-      - "80:80" # The HTTP port
-      - "8080:8080" # The Web UI (enabled by --api.insecure=true)
+      - "80:80" # to able serve traffic for exposed hosts, like front.localhost or traefik.localhost
     volumes:
       # So that Traefik can listen to the Docker events
       - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.api.rule=Host(`traefik.localhost`)"
+        - "traefik.http.routers.api.service=api@internal"
