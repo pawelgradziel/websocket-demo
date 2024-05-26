@@ -44,6 +44,7 @@ https://socket.io/docs/v4/rooms/
 https://socket.io/docs/v4/adapter/#emitter
 https://socket.io/docs/v4/redis-streams-adapter/
 * use multiple clients at the same time - get dedicated messages just for that client
+* sticky session (which hopefully could be solved by some traefik labels, see https://socket.io/docs/v4/using-multiple-nodes/#traefik, but it would be good to get proof it's actually working)
 * try to break chat, so it try to reconnect
 * remove traefik/prometheus - see docker errors/warnings
 
