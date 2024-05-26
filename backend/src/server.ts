@@ -1,8 +1,10 @@
 import express from 'express';
-import Server, { WebSocketServer } from 'ws';
+import { Server as IOServer } from 'socket.io';
 import { connect, Channel } from 'amqplib/callback_api';
+import http from 'http';
 
 const app = express();
+const httpServer = http.createServer(app);
 const port = 3025;
 
 // RabbitMQ connection
@@ -19,19 +21,10 @@ const connectWithRetry = () => {
     }
     console.log('Established connect to RabbitMQ...');
     
-    const server = app.listen(port, () => {
+    const server = httpServer.listen(port, () => {
       console.log(`Backend server started on port ${port}`);
     });
     
-    // on client re-connect 
-    server.on('upgrade', (request, socket, head) => {
-      console.log('Upgrading connection to WebSocket...');
-      wss.handleUpgrade(request, socket, head, ws => {
-        console.log('WebSocket connection established.');
-        wss.emit('connection', ws, request);
-      });
-    });
-
     conn.createChannel((err, ch) => {
       if (err) throw err;
       channel = ch;
@@ -41,13 +34,16 @@ const connectWithRetry = () => {
   });
 };
 
-const wss = new WebSocketServer({ noServer: true });
+const io = new IOServer(
+  httpServer,
+  { cors: { origin: "http://front.localhost" } }
+);
 
-wss.on('connection', ws => {
+io.on('connection', (socket) => {
   console.log('New WebSocket connection.');
 
   // listen to incoming messages from client (sent via websocket)
-  ws.on('message', message => {
+  socket.on('message', message => {
     console.log('WebSocket message received:', message.toString());
     // Enqueue message to RabbitMQ
     if (channel) {
@@ -81,7 +77,7 @@ wss.on('connection', ws => {
       if (msg) {
         console.log('Message received from RabbitMQ chat_responses', msg.content.toString());
         // send to client via websocket
-        ws.send(msg.content.toString());
+        io.emit('response', msg.content.toString());
         console.log('Message sent to client via websocket', msg.content.toString());
         // delete message from queue
         channel.ack(msg);
@@ -93,6 +89,7 @@ wss.on('connection', ws => {
 // Start the connection process
 connectWithRetry();
 
+// this endpoint might be used for health or readiness checks
 app.get('/', (req, res) => { 
   res.send('OK');
 });

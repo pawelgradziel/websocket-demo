@@ -10,13 +10,12 @@ type Message = {
   time: number
 }
 
-// type ServerResponseMessage = {
-//   sender: string
-//   to: string
-//   message: string
-//   time: number
-// }
-
+type ServerResponseMessage = {
+  sender: string
+  to: string
+  message: string
+  time: number
+}
 
 enum MessageStatus {
   ready,
@@ -33,40 +32,28 @@ const App = () => {
   const inputRef = useRef(null);
   const [isConnected, setIsConnected] = useState(socket.connected);
 
-  // const ws = useRef<WebSocket | null>(null);
-
   useEffect(() => {
-    const onConnect = () => {
-      setIsConnected(true);
-    }
-
-    const onDisconnect = () => {
-      setIsConnected(false);
-    }
+    const onConnect = () => setIsConnected(true);
+    const onDisconnect = () => setIsConnected(false);
+    const onResponse = (response: string) => {
+      console.log('on.response', response);
+      const serverResponse = JSON.parse(response) as ServerResponseMessage;
+      const message = {
+        sender: serverResponse.sender,
+        message: serverResponse.message,
+        time: serverResponse.time
+      } as Message;
+      setMessages((prevMessages) => [...prevMessages, message]);
+    };
 
     socket.on('connect', onConnect);
     socket.on('disconnect', onDisconnect);
-
-    // listen to websocket responses
-    // ws.current.onmessage = (event) => {
-    //   console.log('Received message from ws backend', event.data);
-    //   try {
-    //     const serverResponse = JSON.parse(event.data) as ServerResponseMessage;
-    //     console.log('server response', serverResponse);
-    //     const message = {
-    //       sender: serverResponse.sender,
-    //       message: serverResponse.message,
-    //       time: serverResponse.time
-    //     } as Message;
-    //     setMessages((prevMessages) => [...prevMessages, message]);
-    //   } catch (err) {
-    //     console.error('Error parsing message from ws backend', err);
-    //   }
-    // };
+    socket.on('response', onResponse);
 
     return () => {
       socket.off('connect', onConnect);
       socket.off('disconnect', onDisconnect);
+      socket.off('response', onResponse);
     };
   }, []);
 
@@ -80,34 +67,23 @@ const App = () => {
       time: Date.now() 
     } as Message;
 
-
-    const event = 'message';
-    console.log(`emiting ${event} via ws to backend`, message);
-    socket
-      .emit(
-        'message', 
-        JSON.stringify(message),
-        () => {
-          console.log('Message sent', message);
-          setMessages([...messages, message]);
-          setStatus(MessageStatus.ready); 
+    console.log(`emiting message via ws to backend`, message);
+    socket.emit(
+      'message', 
+      JSON.stringify(message),
+      // @ts-ignore
+      (error) => {
+        if (error) {
+          console.error(`Error sending message`, error);
+          setStatus(MessageStatus.error);
+          setError('Error sending message');
         }
-      )
-
+      }
+    );
+    console.log('Message sent', message);
+    setMessages([...messages, message]);
+    setStatus(MessageStatus.ready); 
     setNewMessage('');
-    try {
-      // // ws.current?.send(JSON.stringify(message));
-      // setError('');
-      // // add some delay to simulate the server roundtrip
-      // setTimeout(() => { 
-      //   setMessages([...messages, message]);
-      //   setStatus(MessageStatus.ready);
-      // }, 200);
-  } catch(e) {
-      console.error('Error sending message', e);
-      setError('Error sending message');
-      setStatus(MessageStatus.error)
-    }
   };
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
