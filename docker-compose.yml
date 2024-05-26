@@ -31,10 +31,10 @@ services:
   front:
     build: ./front
     ports:
-      - '5055:5055' # see front/package.json 'preview' --port value
+      - '5055:5055' # see front/package.json 'preview'/'dev' --port value
     volumes:
       - ./front:/app
-    command: bash -c "npm run build && npm run preview"
+    command: bash -c "npm run build && npm run dev"
     restart: on-failure
     labels:
       - "traefik.http.routers.front.rule=Host(`front.localhost`)"

@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { FaPaperPlane, FaSpinner, FaExclamationTriangle } from 'react-icons/fa';
 import { v4 as uuidv4 } from 'uuid';
+import { socket } from './socket'
 
 
 type Message = {
@@ -9,12 +10,12 @@ type Message = {
   time: number
 }
 
-type ServerResponseMessage = {
-  sender: string
-  to: string
-  message: string
-  time: number
-}
+// type ServerResponseMessage = {
+//   sender: string
+//   to: string
+//   message: string
+//   time: number
+// }
 
 
 enum MessageStatus {
@@ -30,36 +31,42 @@ const App = () => {
   const [status, setStatus] = useState<MessageStatus>(MessageStatus.ready);
   const [error, setError] = useState('');
   const inputRef = useRef(null);
+  const [isConnected, setIsConnected] = useState(socket.connected);
 
-  const ws = useRef<WebSocket | null>(null);
+  // const ws = useRef<WebSocket | null>(null);
 
   useEffect(() => {
-    const wsConnectionString = 'ws://backend.localhost';
-    console.log(`Connecting to ws server ${wsConnectionString}...`);
-    ws.current = new WebSocket(wsConnectionString);
-    console.log(`ws connection opened at ${wsConnectionString}`);
+    const onConnect = () => {
+      setIsConnected(true);
+    }
+
+    const onDisconnect = () => {
+      setIsConnected(false);
+    }
+
+    socket.on('connect', onConnect);
+    socket.on('disconnect', onDisconnect);
 
     // listen to websocket responses
-    ws.current.onmessage = (event) => {
-      console.log('Received message from ws backend', event.data);
-      try {
-        const serverResponse = JSON.parse(event.data) as ServerResponseMessage;
-        console.log('server response', serverResponse);
-        const message = {
-          sender: serverResponse.sender,
-          message: serverResponse.message,
-          time: serverResponse.time
-        } as Message;
-        setMessages((prevMessages) => [...prevMessages, message]);
-      } catch (err) {
-        console.error('Error parsing message from ws backend', err);
-      }
-    };
+    // ws.current.onmessage = (event) => {
+    //   console.log('Received message from ws backend', event.data);
+    //   try {
+    //     const serverResponse = JSON.parse(event.data) as ServerResponseMessage;
+    //     console.log('server response', serverResponse);
+    //     const message = {
+    //       sender: serverResponse.sender,
+    //       message: serverResponse.message,
+    //       time: serverResponse.time
+    //     } as Message;
+    //     setMessages((prevMessages) => [...prevMessages, message]);
+    //   } catch (err) {
+    //     console.error('Error parsing message from ws backend', err);
+    //   }
+    // };
 
-    const wsCurrent = ws.current;
     return () => {
-      wsCurrent?.close();
-      console.log(`ws connection closed to ${wsConnectionString}`);
+      socket.off('connect', onConnect);
+      socket.off('disconnect', onDisconnect);
     };
   }, []);
 
@@ -73,16 +80,29 @@ const App = () => {
       time: Date.now() 
     } as Message;
 
+
+    const event = 'message';
+    console.log(`emiting ${event} via ws to backend`, message);
+    socket
+      .emit(
+        'message', 
+        JSON.stringify(message),
+        () => {
+          console.log('Message sent', message);
+          setMessages([...messages, message]);
+          setStatus(MessageStatus.ready); 
+        }
+      )
+
     setNewMessage('');
     try {
-      console.log('Sending message via ws to backend', message);
-      ws.current?.send(JSON.stringify(message));
-      setError('');
-      // add some delay to simulate the server roundtrip
-      setTimeout(() => { 
-        setMessages([...messages, message]);
-        setStatus(MessageStatus.ready);
-      }, 200);
+      // // ws.current?.send(JSON.stringify(message));
+      // setError('');
+      // // add some delay to simulate the server roundtrip
+      // setTimeout(() => { 
+      //   setMessages([...messages, message]);
+      //   setStatus(MessageStatus.ready);
+      // }, 200);
   } catch(e) {
       console.error('Error sending message', e);
       setError('Error sending message');
@@ -101,6 +121,7 @@ const App = () => {
   return (
     <div className="chat">
       <h3>Chat</h3>
+      { isConnected ? <h4 style={{ color: 'green'}}>connected</h4> : <h4 style={{ color: 'red'}}>disconnected</h4> }
       <ul className="messages">
         {messages.map((message: Message, i) => (
           <li key={i} className={`message ${message.sender}`}>
