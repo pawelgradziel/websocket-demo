@@ -29,6 +29,9 @@ const App = () => {
       setMessages((prevMessages) => [...prevMessages, message]);
     };
 
+    socket.auth = { userId };
+    socket.connect(); // connect once we have the userId
+    
     socket.on('connect', onConnect);
     socket.on('disconnect', onDisconnect);
     socket.on('response', onResponse);
@@ -50,7 +53,7 @@ const App = () => {
       time: Date.now() 
     } as Message;
 
-    console.log(`emiting message via ws to backend`, message);
+    console.log(`emiting message to backend`, message);
     socket.emit(
       'message', 
       JSON.stringify(message),
@@ -81,7 +84,7 @@ const App = () => {
 
   return (
     <div className="chat">
-      <h3>Chat</h3>
+      <h3>Chat (user: { userId })</h3>
       { isConnected ? <h4 style={{ color: 'green'}}>connected</h4> : <h4 style={{ color: 'red'}}>disconnected</h4> }
       <ul className="messages">
         {messages.map((message: Message, i) => (
