@@ -2,26 +2,9 @@ import { useEffect, useState, useRef } from 'react';
 import { FaPaperPlane, FaSpinner, FaExclamationTriangle } from 'react-icons/fa';
 import { v4 as uuidv4 } from 'uuid';
 import { socket } from './socket'
-
-
-type Message = {
-  sender: string
-  message: string
-  time: number
-}
-
-type ServerResponseMessage = {
-  sender: string
-  to: string
-  message: string
-  time: number
-}
-
-enum MessageStatus {
-  ready,
-  sending,
-  error
-}
+import { Message } from './types/Message';
+import { MessageStatus } from './types/MessageStatus';
+import { ServerResponseMessage } from './types/ServerResponseMessage';
 
 const App = () => {
   const [userId] = useState(uuidv4().split('-')[4]); // Generate a UUID for the user
@@ -89,11 +72,13 @@ const App = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewMessage(e.target.value);
   };
+
   const handleKeyDown = (e: { key: string; }) => {
     if (e.key === 'Enter') {
       sendMessage();
     }
   };
+
   return (
     <div className="chat">
       <h3>Chat</h3>
